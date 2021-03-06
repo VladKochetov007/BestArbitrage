@@ -18,7 +18,9 @@ setup(
     url='https://github.com/VladKochetov007/BestArbitrage',
     install_requires=[
         'selenium',
-        'numpy'
+        'numpy',
+        'colorama',
+        'ccxt'
     ],
-    download_url='',
+    download_url='https://github.com/VladKochetov007/BestArbitrage/archive/0.3.2.tar.gz',
 )

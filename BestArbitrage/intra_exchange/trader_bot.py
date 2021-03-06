@@ -1,6 +1,7 @@
 from BestArbitrage.BestArbitrage import core
 from BestArbitrage.BestArbitrage.intra_exchange.bestchain import MinMax
-from BestArbitrage.BestArbitrage.intra_exchange import ArbitrageFinder
+from BestArbitrage.BestArbitrage.intra_exchange.parser import ArbitrageFinder
+import time
 
 
 class Robot(object):
@@ -29,10 +30,12 @@ class Robot(object):
         else:
             self.sell_for_all_balance(pare[0])
 
-    def execute_chain(self, chain: MinMax):
+    def execute_chain(self, chain: MinMax, sleep_in_deals=0):
         orders = chain.pare1, chain.pare2, chain.pare3
-        for order in orders:
+        for e, order in enumerate(orders, 1):
             self.run_buy_sell_order(order)
+            if e !=3 and sleep_in_deals:
+                time.sleep(sleep_in_deals)
 
     @staticmethod
     def get_best_chain(chains):
@@ -57,8 +60,8 @@ class Robot(object):
             best = self.get_best_chain(chains=chains)
             return best
 
-    def start_arbitrage(self):
-
+    def start_arbitrage(self, min_profit=0.15, parallel=False, sleep_in_api=0, sleep_in_chains=0, sleep_in_deals=0):
+        pass
 
 
 
