@@ -8,6 +8,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
 
+_test = False
+
+
 def get_percentage(higherprice, lowerprice):
     increace = higherprice - lowerprice
     if lowerprice == 0:
