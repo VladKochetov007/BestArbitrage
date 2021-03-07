@@ -23,7 +23,7 @@ class MinMax(object):
             BS3 = f"buy {pare3[0]}"
         else:
             BS3 = f"sell {pare3[0]}"
-        self.data = f"{BS1}, {BS2}, {BS3} with {round(self.profit, 2)}% profit"
+        self.data = f"{BS1}, {BS2}, {BS3} with {round(self.profit, 3)}% profit"
 
         if profit <= 0:
             self.color = Fore.BLACK

@@ -94,13 +94,3 @@ class ArbitrageFinder:
                 thread = threading.Thread(target=paral_check, args=pares)
                 thread.start()
             return result
-
-
-if __name__ == '__main__':
-    import ccxt
-
-    print(
-        ArbitrageFinder(core.ClientExchangeData(client=ccxt.poloniex())).check(('DMG/USDT', 'ask'), ('DMG/BTC', 'bid'),
-                                                                               ('BTC/USDT', 'bid')))
-    print(ArbitrageFinder(core.ClientExchangeData(client=ccxt.kucoin())).check(('EWT/USDT', 'ask'), ('EWT/BTC', 'bid'),
-                                                                               ('BTC/USDT', 'bid')))
