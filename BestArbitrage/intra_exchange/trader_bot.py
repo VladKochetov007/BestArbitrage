@@ -13,7 +13,7 @@ class Robot(object):
 
     def check_profit(self, chain: MinMax, min_profit=0.4):
         result_chain = self.finder.check(chain.pare1, chain.pare2, chain.pare3)
-        return result_chain.profit > min_profit
+        return result_chain.profit >= min_profit
 
     def buy_for_all_balance(self, symbol):
         if core._test:
@@ -21,7 +21,7 @@ class Robot(object):
         else:
             amount = self.client.client.fetch_free_balance()[symbol.split('/')[1]]
             price = self.client.get_price(symbol, 'ask')
-            self.client.client.create_market_buy_order(symbol=symbol, amount=amount / price)
+            self.client.client.create_order(symbol=symbol, type='market', side='buy', amount=amount/price, price=price)
 
     def sell_for_all_balance(self, symbol):
         if core._test:
@@ -29,7 +29,7 @@ class Robot(object):
         else:
             amount = self.client.client.fetch_free_balance()[symbol.split('/')[0]]
             price = self.client.get_price(symbol, 'bid')
-            self.client.client.create_market_sell_order(symbol=symbol, amount=amount)
+            self.client.client.create_order(symbol=symbol, type='market', side='sell', amount=amount, price=price)
 
     def run_buy_sell_order(self, pare=('BTC/USDT', 'ask')):
         if pare[1] == 'ask':
