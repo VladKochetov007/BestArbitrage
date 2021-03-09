@@ -1,4 +1,3 @@
-import threading
 import time
 
 from BestArbitrage.BestArbitrage import core
@@ -9,7 +8,8 @@ class ArbitrageFinder:
     def __init__(self, client: core.ClientExchangeData):
         self.client = client
 
-    def get_profit(self, alt_base_ask: float, alt_shit_bid: float, shit_base_bid: float):
+    @staticmethod
+    def get_profit(alt_base_ask: float, alt_shit_bid: float, shit_base_bid: float) -> float:
         """
 
         buy  ALT/BASE
@@ -18,7 +18,7 @@ class ArbitrageFinder:
         """
         return core.get_percentage(shit_base_bid, alt_base_ask / alt_shit_bid)
 
-    def pare_arbitrage_generator(self,
+    def pare_arbitrage_generator(self,  # no, i can't use itertools.product. i need to check
                                  base=['BTC', 'USDT'],
                                  alt=['XMR', 'XLM'],
                                  shit=['BTC', 'USDT'],
@@ -68,7 +68,7 @@ class ArbitrageFinder:
         self.pares = tuple(zip(alt_base, alt_shit, shit_base))
         return self.pares
 
-    def check(self, coin, target, market):
+    def check(self, coin, target, market) -> MinMax:
         c = self.client.get_price(coin[0], coin[1])
         c1 = c if coin[1] == 'ask' else 1 / c
         t = self.client.get_price(target[0], target[1])
@@ -78,19 +78,8 @@ class ArbitrageFinder:
         result = self.get_profit(c1, t1, m1)
         return MinMax(coin, target, market, result)
 
-    def start_all_checks(self, sleep=0, parallel=False):
-        if not parallel:
-            for pares in self.pares:
-                yield self.check(*pares)
-                if sleep:
-                    time.sleep(sleep)
-        else:
-            result = []
-
-            def paral_check(*pares):
-                result.append(self.check(*pares))
-
-            for pares in self.pares:
-                thread = threading.Thread(target=paral_check, args=pares)
-                thread.start()
-            return result
+    def start_all_checks(self, sleep=0):
+        for pares in self.pares:
+            yield self.check(*pares)
+            if sleep:
+                time.sleep(sleep)

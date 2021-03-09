@@ -1,1 +1,8 @@
 __pycache__
+dist
+*/__pycache__
+*.log
+MANIFEST
+build
+.pypirc
+BestArbitrage.egg-info

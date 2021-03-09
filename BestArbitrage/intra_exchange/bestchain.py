@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
+from typing import Tuple
+
 from colorama import Fore
 
 
 class MinMax(object):
-    def __init__(self, pare1=(None, None), pare2=(None, None), pare3=(None, None), profit=0):
+    def __init__(self,
+                 pare1: Tuple[str, str] = ('None', 'ask'),
+                 pare2: Tuple[str, str] = ('None', 'bid'),
+                 pare3: Tuple[str, str] = ('None', 'bid'),
+                 profit=0):
         self.pare1 = pare1
         self.pare2 = pare2
         self.pare3 = pare3
@@ -28,9 +34,9 @@ class MinMax(object):
         if profit <= 0:
             self.color = Fore.BLACK
         elif profit < 0.03:
-            self.color = Fore.RED
+            self.color = Fore.LIGHTRED_EX
         elif profit < 0.1:
-            self.color = Fore.YELLOW
+            self.color = Fore.LIGHTYELLOW_EX
         elif profit < 0.2:
             self.color = Fore.GREEN
         elif profit < 0.34:
@@ -42,3 +48,10 @@ class MinMax(object):
 
     def __repr__(self):
         return f"{self.color}{self.data}{Fore.RESET}"
+
+    def get_needed_coin(self):
+        get = lambda x: self.pare1[0].split('/')[x]
+        if self.pare1[1] == 'ask':
+            return get(1)
+        else:
+            return get(0)

@@ -1,12 +1,11 @@
 import re
 
 import ccxt
-import selenium.webdriver.support.expected_conditions as EC
+import selenium.webdriver.support.expected_conditions as ec
 from numpy import inf
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-
 
 _test = False
 
@@ -24,7 +23,10 @@ class ClientExchangeData(object):
     def __init__(self, client: ccxt.Exchange = None):
         self.client = client
         if self.client is not None:
-            self._fetch_tickers = client.fetch_tickers()
+            self.update_tickers()
+
+    def update_tickers(self):
+        self._fetch_tickers = self.client.fetch_tickers()
 
     def get_price(self, symbol, side='ask/bid'):
         ticker = self._fetch_tickers[symbol]
@@ -42,7 +44,7 @@ class AskTradingView(object):
         self.driver.get(f"https://ru.tradingview.com/{screener}/")
 
         waiter = WebDriverWait(self.driver, 5)
-        items = waiter.until(EC.visibility_of_all_elements_located(
+        items = waiter.until(ec.visibility_of_all_elements_located(
             (By.CLASS_NAME, "tv-screener__symbol.apply-common-tooltip")))
         return set(map(lambda x: x.text, items))
 
@@ -55,7 +57,7 @@ class AskTradingView(object):
         for page in range(pages):
             items.extend(
                 waiter.until(
-                    EC.visibility_of_all_elements_located(
+                    ec.visibility_of_all_elements_located(
                         (By.CLASS_NAME, "tv-data-table__row.tv-data-table__stroke.tv-screener-table__result-row")
                     )
                 )
