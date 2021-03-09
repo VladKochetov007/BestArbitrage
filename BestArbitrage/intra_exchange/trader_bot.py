@@ -14,9 +14,10 @@ class Robot(object):
         self.current_quote = quote_in_account
         self.enable_pares = list(client.client.fetch_tickers().keys())
 
-    def check_profit(self, chain: MinMax, min_profit=0.4):
-        result_chain = self.finder.check(chain.pare1, chain.pare2, chain.pare3)
-        return result_chain.profit >= min_profit
+    def check_profit(self, min_profit=0.4):
+        chain = self.current_chain
+        self.current_chain = self.finder.check(chain.pare1, chain.pare2, chain.pare3)
+        return self.current_chain.profit >= min_profit
 
     def buy_for_all_balance(self, symbol):
         if core._test:
@@ -64,38 +65,40 @@ class Robot(object):
         tune = lambda ch: ch.profit
         return max(chains, key=tune)
 
-    def find_chain(self, min_profit=0.5, sleep=0):
+    def find_chain(self, min_profit=0.5):
+        self.client.update_tickers()
         if self.current_chain is not None:
-            is_ok = self.check_profit(self.current_chain, min_profit=min_profit)
+            is_ok = self.check_profit(min_profit=min_profit)
         else:
             is_ok = False
 
         if is_ok:
+            if core._test:
+                print(self.current_chain)
             return self.current_chain
         else:  # finding best chain
-            self.client.update_tickers()
             asset1 = list(set(
                 map(lambda x: x.split('/')[0], self.enable_pares)
             ))
             pares = self.finder.pare_arbitrage_generator(alt=asset1, usable_pares=self.enable_pares)
-            chains = list(self.finder.start_all_checks(sleep=sleep))
+            chains = list(self.finder.start_all_checks())
             best = self._get_best_chain(chains=chains)
             if best.profit >= min_profit:
                 self.current_chain = best
+            else:
+                self.current_chain = None
             if core._test:
                 print(best)
             return self.current_chain
 
     def start_arbitrage(self,
                         min_profit=0.4,
-                        sleep_in_api=0,
                         sleep_in_chains=0,
                         sleep_in_deals=0,
                         print_attention=True):
         while True:
             self.find_chain(
-                min_profit=min_profit,
-                sleep=sleep_in_api
+                min_profit=min_profit
             )
             if self.current_chain is not None:
                 self.prepare_to_chain()
@@ -103,13 +106,10 @@ class Robot(object):
                     sleep_in_deals=sleep_in_deals,
                     print_attention=print_attention
                 )
-                if core._test:
-                    break
 
             time.sleep(sleep_in_chains)
 
     def prepare_to_chain(self):
-        # print(self.current_chain)
         coin = self.current_chain.get_needed_coin()
         if coin != self.current_quote:
             symbol = f"{coin}/{self.current_quote}"

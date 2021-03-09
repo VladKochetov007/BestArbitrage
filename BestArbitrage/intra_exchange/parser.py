@@ -78,8 +78,6 @@ class ArbitrageFinder:
         result = self.get_profit(c1, t1, m1)
         return MinMax(coin, target, market, result)
 
-    def start_all_checks(self, sleep=0):
+    def start_all_checks(self):
         for pares in self.pares:
             yield self.check(*pares)
-            if sleep:
-                time.sleep(sleep)
