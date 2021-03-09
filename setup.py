@@ -11,7 +11,7 @@ setup(
     author='Vlad Kochetov',
     author_email='vladyslavdrrragonkoch@gmail.com',
     packages=setuptools.find_packages(),
-    version='0.3.2',
+    version='0.4.0',
     description='Arbitrage cryptocurrency smartly',
     long_description=long_desc,
     long_description_content_type="text/markdown",
@@ -22,5 +22,5 @@ setup(
         'colorama',
         'ccxt'
     ],
-    download_url='https://github.com/VladKochetov007/BestArbitrage/archive/0.3.2.tar.gz',
+    download_url='https://github.com/VladKochetov007/BestArbitrage/archive/0.4.0.tar.gz',
 )
