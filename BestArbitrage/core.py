@@ -7,7 +7,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
-_test = False
+_TEST = False
+_VERBOSE = False
 
 
 def get_percentage(higherprice, lowerprice):

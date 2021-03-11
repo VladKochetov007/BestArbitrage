@@ -7,12 +7,13 @@ from BestArbitrage.BestArbitrage.intra_exchange.parser import ArbitrageFinder
 
 class Robot(object):
     # noinspection PyTypeChecker
-    def __init__(self, client: core.ClientExchangeData = None, quote_in_account='USDT'):
+    def __init__(self, client: core.ClientExchangeData = None, quote_in_account='USDT', use_quote_only=False):
         self.client = client
         self.current_chain: MinMax = None
         self.finder = ArbitrageFinder(client=client)
         self.current_quote = quote_in_account
         self.enable_pares = list(client.client.fetch_tickers().keys())
+        self.use_only_quote = use_quote_only
 
     def check_profit(self, min_profit=0.4):
         chain = self.current_chain
@@ -20,9 +21,9 @@ class Robot(object):
         return self.current_chain.profit >= min_profit
 
     def buy_for_all_balance(self, symbol):
-        if core._test:
+        if core._VERBOSE:
             print(f"buy {symbol}")
-        else:
+        if not core._TEST:
             amount = self.client.client.fetch_free_balance()[symbol.split('/')[1]]
             price = self.client.get_price(symbol, 'ask')
             self.client.client.create_order(
@@ -34,9 +35,9 @@ class Robot(object):
             )
 
     def sell_for_all_balance(self, symbol):
-        if core._test:
+        if core._VERBOSE:
             print(f"sell {symbol}")
-        else:
+        if not core._TEST:
             amount = self.client.client.fetch_free_balance()[symbol.split('/')[0]]
             price = self.client.get_price(symbol, 'bid')
             self.client.client.create_order(
@@ -47,7 +48,7 @@ class Robot(object):
                 price=price
             )
 
-    def run_buy_sell_order(self, pare=('BTC/USD', 'ask')):
+    def run_buy_sell_order(self, pare=('BTC/USDT', 'ask')):
         if pare[1] == 'ask':
             self.buy_for_all_balance(pare[0])
         else:
@@ -73,7 +74,7 @@ class Robot(object):
             is_ok = False
 
         if is_ok:
-            if core._test:
+            if core._VERBOSE:
                 print(self.current_chain)
             return self.current_chain
         else:  # finding best chain
@@ -87,7 +88,7 @@ class Robot(object):
                 self.current_chain = best
             else:
                 self.current_chain = None
-            if core._test:
+            if core._VERBOSE:
                 print(best)
             return self.current_chain
 
@@ -100,7 +101,11 @@ class Robot(object):
             self.find_chain(
                 min_profit=min_profit
             )
-            if self.current_chain is not None:
+            if (not self.use_only_quote) or self.current_quote == self.current_chain.get_needed_coin():
+                quote_can_use = True
+            else:
+                quote_can_use = False
+            if self.current_chain is not None and quote_can_use:
                 self.prepare_to_chain()
                 self.execute_chain(
                     sleep_in_deals=sleep_in_deals,
