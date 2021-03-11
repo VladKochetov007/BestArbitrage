@@ -6,9 +6,9 @@ from BestArbitrage.BestArbitrage.intra_exchange.parser import ArbitrageFinder
 
 
 class Robot(object):
-    # noinspection PyTypeChecker
     def __init__(self, client: core.ClientExchangeData = None, quote_in_account='USDT', use_quote_only=False):
         self.client = client
+        # noinspection PyTypeChecker
         self.current_chain: MinMax = None
         self.finder = ArbitrageFinder(client=client)
         self.current_quote = quote_in_account
