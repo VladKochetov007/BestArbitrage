@@ -59,7 +59,9 @@ class AskTradingView(object):
             items.extend(
                 waiter.until(
                     ec.visibility_of_all_elements_located(
-                        (By.CLASS_NAME, "tv-data-table__row.tv-data-table__stroke.tv-screener-table__result-row")
+                        (By.CLASS_NAME,
+                         "tv-data-table__row.tv-data-table__stroke."
+                         "tv-screener-table__result-row")
                     )
                 )
             )

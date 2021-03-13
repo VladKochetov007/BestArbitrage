@@ -7,7 +7,6 @@ from BestArbitrage.BestArbitrage.intra_exchange.parser import ArbitrageFinder
 
 class Robot(object):
     def __init__(self, client: core.ClientExchangeData = None, quote_in_account='USDT', use_quote_only=False):
-        self.client = client
         # noinspection PyTypeChecker
         self.current_chain: MinMax = None
         self.finder = ArbitrageFinder(client=client)
@@ -24,9 +23,9 @@ class Robot(object):
         if core._VERBOSE:
             print(f"buy {symbol}")
         if not core._TEST:
-            amount = self.client.client.fetch_free_balance()[symbol.split('/')[1]]
-            price = self.client.get_price(symbol, 'ask')
-            self.client.client.create_order(
+            amount = self.finder.client.client.fetch_free_balance()[symbol.split('/')[1]]
+            price = self.finder.client.get_price(symbol, 'ask')
+            self.finder.client.client.create_order(
                 symbol=symbol,
                 type='market',
                 side='buy',
@@ -38,9 +37,9 @@ class Robot(object):
         if core._VERBOSE:
             print(f"sell {symbol}")
         if not core._TEST:
-            amount = self.client.client.fetch_free_balance()[symbol.split('/')[0]]
-            price = self.client.get_price(symbol, 'bid')
-            self.client.client.create_order(
+            amount = self.finder.client.client.fetch_free_balance()[symbol.split('/')[0]]
+            price = self.finder.client.get_price(symbol, 'bid')
+            self.finder.client.client.create_order(
                 symbol=symbol,
                 type='market',
                 side='sell',
@@ -49,13 +48,17 @@ class Robot(object):
             )
 
     def run_buy_sell_order(self, pare=('BTC/USDT', 'ask')):
+        if core._VERBOSE:
+            print(pare)
         if pare[1] == 'ask':
             self.buy_for_all_balance(pare[0])
         else:
             self.sell_for_all_balance(pare[0])
 
-    def execute_chain(self, sleep_in_deals=0, print_attention=True):
-        orders = self.current_chain.pare1, self.current_chain.pare2, self.current_chain.pare3
+    def execute_chain(self, sleep_in_deals=0):
+        orders = (self.current_chain.pare1,
+                  self.current_chain.pare2,
+                  self.current_chain.pare3)
         for e, order in enumerate(orders, 1):
             self.run_buy_sell_order(order)
             if e != 3 and sleep_in_deals:
@@ -67,7 +70,7 @@ class Robot(object):
         return max(chains, key=tune)
 
     def find_chain(self, min_profit=0.5):
-        self.client.update_tickers()
+        self.finder.client.update_tickers()
         if self.current_chain is not None:
             is_ok = self.check_profit(min_profit=min_profit)
         else:
@@ -78,10 +81,6 @@ class Robot(object):
                 print(self.current_chain)
             return self.current_chain
         else:  # finding best chain
-            asset1 = list(set(
-                map(lambda x: x.split('/')[0], self.enable_pares)
-            ))
-            pares = self.finder.pare_arbitrage_generator(alt=asset1, usable_pares=self.enable_pares)
             chains = list(self.finder.start_all_checks())
             best = self._get_best_chain(chains=chains)
             if best.profit >= min_profit:
@@ -95,22 +94,24 @@ class Robot(object):
     def start_arbitrage(self,
                         min_profit=0.4,
                         sleep_in_chains=0,
-                        sleep_in_deals=0,
-                        print_attention=True):
+                        sleep_in_deals=0):
+        asset1 = list(set(
+            map(lambda x: x.split('/')[0], self.enable_pares)
+        ))
+        self.finder.pare_arbitrage_generator(
+            alt=asset1,
+            usable_pares=self.enable_pares
+        )
         while True:
             self.find_chain(
                 min_profit=min_profit
             )
-            if (not self.use_only_quote) or self.current_quote == self.current_chain.get_needed_coin():
-                quote_can_use = True
-            else:
-                quote_can_use = False
-            if self.current_chain is not None and quote_can_use:
-                self.prepare_to_chain()
-                self.execute_chain(
-                    sleep_in_deals=sleep_in_deals,
-                    print_attention=print_attention
-                )
+            if self.current_chain is not None:
+                if (not self.use_only_quote) or self.current_quote == self.current_chain.get_needed_coin():
+                    self.prepare_to_chain()
+                    self.execute_chain(
+                        sleep_in_deals=sleep_in_deals
+                    )
 
             time.sleep(sleep_in_chains)
 

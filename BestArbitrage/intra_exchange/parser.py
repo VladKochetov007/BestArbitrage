@@ -1,5 +1,3 @@
-import time
-
 from BestArbitrage.BestArbitrage import core
 from BestArbitrage.BestArbitrage.intra_exchange.bestchain import MinMax
 
@@ -9,16 +7,21 @@ class ArbitrageFinder:
         self.client = client
 
     @staticmethod
-    def get_profit(alt_base_ask: float, alt_shit_bid: float, shit_base_bid: float) -> float:
+    def get_profit(alt_base_ask: float,
+                   alt_shit_bid: float,
+                   shit_base_bid: float) -> float:
         """
 
         buy  ALT/BASE
         sell ALT/SHIT
         sell SHIT/BASE
         """
+        if alt_shit_bid == 0:
+            return 0
         return core.get_percentage(shit_base_bid, alt_base_ask / alt_shit_bid)
 
-    def pare_arbitrage_generator(self,  # no, i can't use itertools.product. i need to check
+    def pare_arbitrage_generator(self,
+                                 # no, i can't use itertools.product. I need to check
                                  base=['BTC', 'USDT'],
                                  alt=['XMR', 'XLM'],
                                  shit=['BTC', 'USDT'],
@@ -69,13 +72,17 @@ class ArbitrageFinder:
         return self.pares
 
     def check(self, coin, target, market) -> MinMax:
+
         c = self.client.get_price(coin[0], coin[1])
-        c1 = c if coin[1] == 'ask' else 1 / c
         t = self.client.get_price(target[0], target[1])
-        t1 = t if target[1] == 'bid' else 1 / t
         m = self.client.get_price(market[0], market[1])
+        if c == 0 or t == 0 or m == 0:
+            return MinMax(coin, target, market)
+        c1 = c if coin[1] == 'ask' else 1 / c
+        t1 = t if target[1] == 'bid' else 1 / t
         m1 = m if market[1] == 'bid' else 1 / m
         result = self.get_profit(c1, t1, m1)
+
         return MinMax(coin, target, market, result)
 
     def start_all_checks(self):
