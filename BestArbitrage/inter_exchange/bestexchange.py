@@ -24,9 +24,9 @@ class MinMax(object):
         self.pare = pare
 
         if self.percentage_profit < 0.3:
-            self.color = fore.RED
+            self.color = fore.LIGHTRED_EX
         elif self.percentage_profit < 1:
-            self.color = fore.YELLOW
+            self.color = fore.LIGHTYELLOW_EX
         elif self.percentage_profit < 2:
             self.color = fore.GREEN
         elif self.percentage_profit < 3.4:
