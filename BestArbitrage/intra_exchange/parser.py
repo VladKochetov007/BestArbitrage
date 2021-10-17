@@ -3,7 +3,7 @@ from BestArbitrage.BestArbitrage.intra_exchange.bestchain import MinMax
 
 
 class ArbitrageFinder:
-    def __init__(self, client: core.ClientExchangeData):
+    def __init__(self, client: core.Client):
         self.client = client
 
     @staticmethod

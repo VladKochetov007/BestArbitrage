@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-from distutils.core import setup
-
 import setuptools
+from distutils.core import setup
 
 with open('./README.md') as file:
     long_desc = file.read()
-_version_ = '0.4.1'
+_version_ = '0.4.2'
 setup(
     name='BestArbitrage',
     author='Vlad Kochetov',

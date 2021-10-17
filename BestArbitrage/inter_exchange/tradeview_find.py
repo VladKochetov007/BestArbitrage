@@ -6,23 +6,23 @@ import BestArbitrage.BestArbitrage.inter_exchange.bestexchange as bestexchange
 from BestArbitrage.BestArbitrage import core
 
 
-class ArbitrageFounder(core.AskTradingView):
-
+class ArbitrageFinder(core.AskTradingView):
     def get_data(
-            self,
-            pair,
-            your_exchanges=[
-                "BINANCE",
-                "FTX"
-            ],
-            exchange_blacklist=["BITTREX", "CAPITALCOM", "CURRENCYCOM"],
-            all_exchanges=True,
-            min_volumes={
-                'BTC': 0.25,
-                'ETH': 5,
-                'USDT': 10000
-            },
-            print_oops=True):
+        self,
+        pair,
+        your_exchanges=[
+            "BINANCE",
+            "FTX"
+        ],
+        exchange_blacklist=["BITTREX", "CAPITALCOM", "CURRENCYCOM"],
+        all_exchanges=True,
+        min_volumes={
+            'BTC': 0.25,
+            'ETH': 5,
+            'USDT': 10000
+        },
+        print_oops=True
+    ):
         try:
             exc_pair = {}
             self.driver.get(f"https://ru.tradingview.com/symbols/{pair}/markets/")
@@ -50,8 +50,7 @@ class ArbitrageFounder(core.AskTradingView):
                                     min_volumes.values()):
                     if pair.endswith(key):
                         min_vol_ = val
-                if (
-                        exchange in your_exchanges or all_exchanges) and vol >= min_vol_ and exchange not in exchange_blacklist:
+                if (exchange in your_exchanges or all_exchanges) and vol >= min_vol_ and exchange not in exchange_blacklist:
                     exc_pair[exchange] = {"volume": vol,
                                           "price": price}
             if len(list(exc_pair.keys())) == 0:
@@ -70,8 +69,8 @@ class ArbitrageFounder(core.AskTradingView):
                 get_sort(minimal),
                 get_sort(maximal),
                 pair=pair,
-                higprex_vol=exc_pair[get_sort_key(maximal)]['volume'],
-                loprex_vol=exc_pair[get_sort_key(minimal)]['volume']
+                lower_price_volume=exc_pair[get_sort_key(maximal)]['volume'],
+                higher_price_volume=exc_pair[get_sort_key(minimal)]['volume']
             )
         except Exception as e:
             if isinstance(e, (KeyboardInterrupt, InvalidSessionIdException)):

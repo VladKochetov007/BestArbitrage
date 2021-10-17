@@ -6,8 +6,7 @@ from BestArbitrage.BestArbitrage.intra_exchange.parser import ArbitrageFinder
 
 
 class Robot(object):
-    def __init__(self, client: core.ClientExchangeData = None, quote_in_account='USDT', use_quote_only=False):
-        # noinspection PyTypeChecker
+    def __init__(self, client: core.Client = None, quote_in_account='USDT', use_quote_only=False):
         self.current_chain: MinMax = None
         self.finder = ArbitrageFinder(client=client)
         self.current_quote = quote_in_account
@@ -71,25 +70,15 @@ class Robot(object):
 
     def find_chain(self, min_profit=0.5):
         self.finder.client.update_tickers()
-        if self.current_chain is not None:
-            is_ok = self.check_profit(min_profit=min_profit)
+        chains = list(self.finder.start_all_checks())
+        best = self._get_best_chain(chains=chains)
+        if best.profit >= min_profit:
+            self.current_chain = best
         else:
-            is_ok = False
-
-        if is_ok:
-            if core._VERBOSE:
-                print(self.current_chain)
-            return self.current_chain
-        else:  # finding best chain
-            chains = list(self.finder.start_all_checks())
-            best = self._get_best_chain(chains=chains)
-            if best.profit >= min_profit:
-                self.current_chain = best
-            else:
-                self.current_chain = None
-            if core._VERBOSE:
-                print(best)
-            return self.current_chain
+            self.current_chain = None
+        if core._VERBOSE:
+            print(best)
+        return self.current_chain
 
     def start_arbitrage(self,
                         min_profit=0.4,
@@ -103,19 +92,14 @@ class Robot(object):
             usable_pairs=self.enable_pairs
         )
         while True:
-            self.find_chain(
-                min_profit=min_profit
-            )
+            self.find_chain(min_profit=min_profit)
             if self.current_chain is not None:
                 if (not self.use_only_quote) or self.current_quote == self.current_chain.get_needed_coin():
-                    self.prepair_to_chain()
-                    self.execute_chain(
-                        sleep_in_deals=sleep_in_deals
-                    )
-
+                    self.prepare_to_chain()
+                    self.execute_chain(sleep_in_deals=sleep_in_deals)
             time.sleep(sleep_in_chains)
 
-    def prepair_to_chain(self):
+    def prepare_to_chain(self):
         coin = self.current_chain.get_needed_coin()
         if coin != self.current_quote:
             symbol = f"{coin}/{self.current_quote}"

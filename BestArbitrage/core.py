@@ -20,17 +20,17 @@ def get_percentage(higher_price, lower_price):
     return percentage_profit
 
 
-class ClientExchangeData(object):
+class Client(object):
     def __init__(self, client: ccxt.Exchange = None):
         self.client = client
         if self.client is not None:
             self.update_tickers()
 
     def update_tickers(self):
-        self._fetch_tickers = self.client.fetch_tickers()
+        self._tickers = self.client.fetch_tickers()
 
     def get_price(self, symbol, side='ask/bid'):
-        ticker = self._fetch_tickers[symbol]
+        ticker = self._tickers[symbol]
         if side == "ask":
             return float(ticker['ask'])
         else:
