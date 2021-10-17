@@ -11,12 +11,12 @@ _TEST = False
 _VERBOSE = False
 
 
-def get_percentage(higherprice, lowerprice):
-    increace = higherprice - lowerprice
-    if lowerprice == 0:
+def get_percentage(higher_price, lower_price):
+    increase = higher_price - lower_price
+    if lower_price == 0:
         percentage_profit = inf
     else:
-        percentage_profit = (increace / lowerprice) * 100
+        percentage_profit = (increase / lower_price) * 100
     return percentage_profit
 
 
@@ -41,7 +41,7 @@ class AskTradingView(object):
     def __init__(self, driver=None):
         self.driver: webdriver.Safari = driver
 
-    def get_all_tv_pares(self, screener='crypto-screener'):
+    def get_all_tv_pairs(self, screener='crypto-screener'):
         self.driver.get(f"https://ru.tradingview.com/{screener}/")
 
         waiter = WebDriverWait(self.driver, 5)

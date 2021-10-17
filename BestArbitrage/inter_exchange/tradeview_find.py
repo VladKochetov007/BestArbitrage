@@ -10,7 +10,7 @@ class ArbitrageFounder(core.AskTradingView):
 
     def get_data(
             self,
-            pare,
+            pair,
             your_exchanges=[
                 "BINANCE",
                 "FTX"
@@ -24,8 +24,8 @@ class ArbitrageFounder(core.AskTradingView):
             },
             print_oops=True):
         try:
-            exc_pare = {}
-            self.driver.get(f"https://ru.tradingview.com/symbols/{pare}/markets/")
+            exc_pair = {}
+            self.driver.get(f"https://ru.tradingview.com/symbols/{pair}/markets/")
             exchanges = self.driver.find_elements_by_class_name(
                 "tv-data-table__row.tv-data-table__stroke.tv-screener-table__result-row"
             )
@@ -48,17 +48,17 @@ class ArbitrageFounder(core.AskTradingView):
                 price = float(item_call[1].text)
                 for key, val in zip(min_volumes.keys(),
                                     min_volumes.values()):
-                    if pare.endswith(key):
+                    if pair.endswith(key):
                         min_vol_ = val
                 if (
                         exchange in your_exchanges or all_exchanges) and vol >= min_vol_ and exchange not in exchange_blacklist:
-                    exc_pare[exchange] = {"volume": vol,
+                    exc_pair[exchange] = {"volume": vol,
                                           "price": price}
-            if len(list(exc_pare.keys())) == 0:
+            if len(list(exc_pair.keys())) == 0:
                 return None
             list_exchanges = []
-            for exchange in exc_pare.keys():
-                price = exc_pare[exchange]["price"]
+            for exchange in exc_pair.keys():
+                price = exc_pair[exchange]["price"]
                 list_exchanges.append({exchange: price})
             get_sort = lambda x: list(x.values())[0]
             get_sort_key = lambda x: list(x.keys())[0]
@@ -69,9 +69,9 @@ class ArbitrageFounder(core.AskTradingView):
                 get_sort_key(maximal),
                 get_sort(minimal),
                 get_sort(maximal),
-                pare=pare,
-                higprex_vol=exc_pare[get_sort_key(maximal)]['volume'],
-                loprex_vol=exc_pare[get_sort_key(minimal)]['volume']
+                pair=pair,
+                higprex_vol=exc_pair[get_sort_key(maximal)]['volume'],
+                loprex_vol=exc_pair[get_sort_key(minimal)]['volume']
             )
         except Exception as e:
             if isinstance(e, (KeyboardInterrupt, InvalidSessionIdException)):

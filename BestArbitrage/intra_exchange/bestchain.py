@@ -6,29 +6,29 @@ from colorama import Fore
 
 class MinMax(object):
     def __init__(self,
-                 pare1: Tuple[str, str] = ('None', 'ask'),
-                 pare2: Tuple[str, str] = ('None', 'bid'),
-                 pare3: Tuple[str, str] = ('None', 'bid'),
+                 pair1: Tuple[str, str] = ('None', 'ask'),
+                 pair2: Tuple[str, str] = ('None', 'bid'),
+                 pair3: Tuple[str, str] = ('None', 'bid'),
                  profit=0):
-        self.pare1 = pare1
-        self.pare2 = pare2
-        self.pare3 = pare3
+        self.pair1 = pair1
+        self.pair2 = pair2
+        self.pair3 = pair3
         self.profit = profit
 
-        if pare1[1] == 'ask':
-            BS1 = f"buy {pare1[0]}"
+        if pair1[1] == 'ask':
+            BS1 = f"buy {pair1[0]}"
         else:
-            BS1 = f"sell {pare1[0]}"
+            BS1 = f"sell {pair1[0]}"
 
-        if pare2[1] == 'ask':
-            BS2 = f"buy {pare2[0]}"
+        if pair2[1] == 'ask':
+            BS2 = f"buy {pair2[0]}"
         else:
-            BS2 = f"sell {pare2[0]}"
+            BS2 = f"sell {pair2[0]}"
 
-        if pare3[1] == 'ask':
-            BS3 = f"buy {pare3[0]}"
+        if pair3[1] == 'ask':
+            BS3 = f"buy {pair3[0]}"
         else:
-            BS3 = f"sell {pare3[0]}"
+            BS3 = f"sell {pair3[0]}"
         self.data = f"{BS1}, {BS2}, {BS3} with {round(self.profit, 3)}% profit"
 
         if profit <= 0:
@@ -50,8 +50,8 @@ class MinMax(object):
         return f"{self.color}{self.data}{Fore.RESET}"
 
     def get_needed_coin(self):
-        get = lambda x: self.pare1[0].split('/')[x]
-        if self.pare1[1] == 'ask':
+        get = lambda x: self.pair1[0].split('/')[x]
+        if self.pair1[1] == 'ask':
             return get(1)
         else:
             return get(0)

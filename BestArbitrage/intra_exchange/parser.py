@@ -15,17 +15,19 @@ class ArbitrageFinder:
         buy  ALT/BASE
         sell ALT/SHIT
         sell SHIT/BASE
+
+        BASE -> ALT -> SHIT
         """
         if alt_shit_bid == 0:
             return 0
         return core.get_percentage(shit_base_bid, alt_base_ask / alt_shit_bid)
 
-    def pare_arbitrage_generator(self,
+    def pair_arbitrage_generator(self,
                                  # no, i can't use itertools.product. I need to check
                                  base=['BTC', 'USDT'],
                                  alt=['XMR', 'XLM'],
                                  shit=['BTC', 'USDT'],
-                                 usable_pares=[]):
+                                 usable_pairs=[]):
         alt_base = []
         alt_shit = []
         shit_base = []
@@ -43,23 +45,23 @@ class ArbitrageFinder:
                         shal = f"{market}/{coin}"
                         bash = f"{target}/{market}"
 
-                        if alba in usable_pares:
+                        if alba in usable_pairs:
                             alba = (alba, 'ask')
-                        elif baal in usable_pares:
+                        elif baal in usable_pairs:
                             alba = (baal, 'bid')
                         else:
                             can = False
 
-                        if alsh in usable_pares:
+                        if alsh in usable_pairs:
                             alsh = (alsh, 'bid')
-                        elif shal in usable_pares:
+                        elif shal in usable_pairs:
                             alsh = (shal, 'ask')
                         else:
                             can = False
 
-                        if shba in usable_pares:
+                        if shba in usable_pairs:
                             shba = (shba, 'bid')
-                        elif bash in usable_pares:
+                        elif bash in usable_pairs:
                             shba = (bash, 'ask')
                         else:
                             can = False
@@ -68,8 +70,8 @@ class ArbitrageFinder:
                             alt_base.append(alba)
                             alt_shit.append(alsh)
                             shit_base.append(shba)
-        self.pares = tuple(zip(alt_base, alt_shit, shit_base))
-        return self.pares
+        self.pairs = tuple(zip(alt_base, alt_shit, shit_base))
+        return self.pairs
 
     def check(self, coin, target, market) -> MinMax:
 
@@ -86,5 +88,5 @@ class ArbitrageFinder:
         return MinMax(coin, target, market, result)
 
     def start_all_checks(self):
-        for pares in self.pares:
-            yield self.check(*pares)
+        for pairs in self.pairs:
+            yield self.check(*pairs)

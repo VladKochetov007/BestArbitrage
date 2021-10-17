@@ -5,13 +5,13 @@ import setuptools
 
 with open('./README.md') as file:
     long_desc = file.read()
-
+_version_ = '0.4.1'
 setup(
     name='BestArbitrage',
     author='Vlad Kochetov',
     author_email='vladyslavdrrragonkoch@gmail.com',
     packages=setuptools.find_packages(),
-    version='0.4.0',
+    version=_version_,
     description='Arbitrage cryptocurrency smartly',
     long_description=long_desc,
     long_description_content_type="text/markdown",
@@ -22,5 +22,5 @@ setup(
         'colorama',
         'ccxt'
     ],
-    download_url='https://github.com/VladKochetov007/BestArbitrage/archive/0.4.0.tar.gz',
+    download_url=f'https://github.com/VladKochetov007/BestArbitrage/archive/{_version_}.tar.gz',
 )

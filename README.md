@@ -1,9 +1,9 @@
 # BestArbitrage
 Intuitive cryptocurrency arbitrage software
 
-user code example:
-```
-from BestArbitrage.intra_exchange.trader_bot import Robot
+example:
+```python
+from BestArbitrage.intra_exchange.trading_bot import Robot
 from BestArbitrage import core
 import ccxt
 

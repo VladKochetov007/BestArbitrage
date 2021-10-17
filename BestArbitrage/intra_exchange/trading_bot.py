@@ -11,12 +11,12 @@ class Robot(object):
         self.current_chain: MinMax = None
         self.finder = ArbitrageFinder(client=client)
         self.current_quote = quote_in_account
-        self.enable_pares = list(client.client.fetch_tickers().keys())
+        self.enable_pairs = list(client.client.fetch_tickers().keys())
         self.use_only_quote = use_quote_only
 
     def check_profit(self, min_profit=0.4):
         chain = self.current_chain
-        self.current_chain = self.finder.check(chain.pare1, chain.pare2, chain.pare3)
+        self.current_chain = self.finder.check(chain.pair1, chain.pair2, chain.pair3)
         return self.current_chain.profit >= min_profit
 
     def buy_for_all_balance(self, symbol):
@@ -47,18 +47,18 @@ class Robot(object):
                 price=price
             )
 
-    def run_buy_sell_order(self, pare=('BTC/USDT', 'ask')):
+    def run_buy_sell_order(self, pair=('BTC/USDT', 'ask')):
         if core._VERBOSE:
-            print(pare)
-        if pare[1] == 'ask':
-            self.buy_for_all_balance(pare[0])
+            print(pair)
+        if pair[1] == 'ask':
+            self.buy_for_all_balance(pair[0])
         else:
-            self.sell_for_all_balance(pare[0])
+            self.sell_for_all_balance(pair[0])
 
     def execute_chain(self, sleep_in_deals=0):
-        orders = (self.current_chain.pare1,
-                  self.current_chain.pare2,
-                  self.current_chain.pare3)
+        orders = (self.current_chain.pair1,
+                  self.current_chain.pair2,
+                  self.current_chain.pair3)
         for e, order in enumerate(orders, 1):
             self.run_buy_sell_order(order)
             if e != 3 and sleep_in_deals:
@@ -96,11 +96,11 @@ class Robot(object):
                         sleep_in_chains=0,
                         sleep_in_deals=0):
         asset1 = list(set(
-            map(lambda x: x.split('/')[0], self.enable_pares)
+            map(lambda x: x.split('/')[0], self.enable_pairs)
         ))
-        self.finder.pare_arbitrage_generator(
+        self.finder.pair_arbitrage_generator(
             alt=asset1,
-            usable_pares=self.enable_pares
+            usable_pairs=self.enable_pairs
         )
         while True:
             self.find_chain(
@@ -108,18 +108,18 @@ class Robot(object):
             )
             if self.current_chain is not None:
                 if (not self.use_only_quote) or self.current_quote == self.current_chain.get_needed_coin():
-                    self.prepare_to_chain()
+                    self.prepair_to_chain()
                     self.execute_chain(
                         sleep_in_deals=sleep_in_deals
                     )
 
             time.sleep(sleep_in_chains)
 
-    def prepare_to_chain(self):
+    def prepair_to_chain(self):
         coin = self.current_chain.get_needed_coin()
         if coin != self.current_quote:
             symbol = f"{coin}/{self.current_quote}"
-            if symbol not in self.enable_pares:
+            if symbol not in self.enable_pairs:
                 self.sell_for_all_balance(f"{self.current_quote}/{coin}")
             else:
                 self.buy_for_all_balance(symbol)
