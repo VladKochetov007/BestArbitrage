@@ -1,5 +1,4 @@
 # BestArbitrage
-![image](https://github.com/VladKochetov007/BestArbitrage/blob/main/LOGO.PNG?raw=true)
 Intuitive cryptocurrency arbitrage software
 
 user code example:
